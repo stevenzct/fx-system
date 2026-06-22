@@ -2,9 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NavIcon } from "@/components/layout/NavIcon";
 import { navItems } from "@/components/layout/navigation";
 
 function isActive(pathname: string, href: string) {
+  if (href === "/receipts") {
+    return pathname === href || pathname.startsWith("/transactions/") || pathname.startsWith("/print/transaction/");
+  }
+
   if (href === "/ledger") {
     return pathname === href;
   }
@@ -39,7 +44,13 @@ export function SidebarNav() {
                 active ? "bg-white/10 text-white" : "text-slate-300 hover:bg-white/10 hover:text-white"
               }`}
             >
-              <span className={`size-2 rounded-full ${active ? "bg-emerald-400" : "bg-slate-500"}`} />
+              <span
+                className={`grid size-8 shrink-0 place-items-center rounded-[11px] transition ${
+                  active ? "bg-emerald-400/15 text-emerald-300" : "bg-white/5 text-slate-400"
+                }`}
+              >
+                <NavIcon name={item.icon} />
+              </span>
               {item.label}
             </Link>
           );
