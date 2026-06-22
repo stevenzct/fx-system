@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FX System Prototype</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #14213d;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #167a5a;
+      --primary-2: #0f5f46;
+      --soft: #e8f6f0;
+      --blue: #2563eb;
+      --amber: #f59e0b;
+      --red: #dc2626;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    aside {
+      background: #0f172a;
+      color: #fff;
+      padding: 28px 22px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 34px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #1cc88a, #167a5a);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .brand small {
+      display: block;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-item {
+      border: 0;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      color: #cbd5e1;
+      padding: 13px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: 0.2s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+
+    .nav-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 99px;
+      background: #64748b;
+    }
+
+    .nav-item.active .nav-dot { background: #1cc88a; }
+
+    .sidebar-card {
+      margin-top: 32px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .sidebar-card p {
+      color: #cbd5e1;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 8px 0 0;
+    }
+
+    main {
+      padding: 28px;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.04em;
+    }
+
+    .title p {
+      margin: 7px 0 0;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 13px;
+      padding: 12px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--primary);
+      color: #fff;
+      transition: 0.2s;
+    }
+
+    .btn:hover { background: var(--primary-2); transform: translateY(-1px); }
+    .btn.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    .btn.secondary:hover { background: #f8fafc; }
+
+    .page { display: none; animation: fade 0.25s ease; }
+    .page.active { display: block; }
+    @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .grid { display: grid; gap: 18px; }
+    .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .two-col { grid-template-columns: 1.25fr 0.75fr; align-items: start; }
+    .three-col { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label { color: var(--muted); font-size: 13px; }
+    .stat-value { font-size: 25px; font-weight: 850; margin-top: 8px; letter-spacing: -0.04em; }
+    .stat-sub { color: var(--primary); font-size: 12px; margin-top: 8px; font-weight: 700; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .card-header h2, .card h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .card-header p, .helper { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 12px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--line);
+    }
+
+    td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--line);
+      color: #334155;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.buy { background: #e8f6f0; color: #167a5a; }
+    .badge.sell { background: #eff6ff; color: #2563eb; }
+    .badge.pending { background: #fff7ed; color: #ea580c; }
+    .badge.done { background: #ecfdf5; color: #059669; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 13px 14px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+      color: var(--ink);
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(22, 122, 90, 0.12);
+    }
+
+    .summary-box {
+      background: linear-gradient(135deg, var(--soft), #fff);
+      border: 1px solid #ccebdd;
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px dashed #cbd5e1;
+      font-size: 14px;
+    }
+    .summary-row:last-child { border-bottom: 0; }
+    .summary-row strong { font-size: 18px; }
+
+    .receipt {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #111827;
+    }
+
+    .receipt-top {
+      text-align: center;
+      border-bottom: 1px dashed #94a3b8;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+    }
+
+    .receipt-top h3 { margin: 0; font-family: inherit; }
+    .receipt-line { display: flex; justify-content: space-between; gap: 18px; font-size: 12px; padding: 7px 0; }
+    .receipt-total { border-top: 1px dashed #94a3b8; margin-top: 12px; padding-top: 12px; font-weight: 900; }
+
+    .branch-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .branch-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+    }
+
+    .branch-head h3 { margin: 0; }
+    .meter {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .meter span { display: block; height: 100%; background: var(--primary); border-radius: 99px; }
+
+    .rate-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fbfdff;
+    }
+
+    .rate-pair { font-weight: 900; font-size: 18px; }
+    .rate-values { text-align: right; color: var(--muted); font-size: 13px; }
+    .rate-values strong { color: var(--ink); }
+
+    .mini-chart {
+      height: 240px;
+      display: flex;
+      gap: 12px;
+      align-items: end;
+      padding: 16px 4px 4px;
+      border-bottom: 1px solid var(--line);
+    }
+    .bar {
+      flex: 1;
+      background: linear-gradient(180deg, #1cc88a, #167a5a);
+      border-radius: 12px 12px 0 0;
+      position: relative;
+      min-width: 24px;
+    }
+    .bar span {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 7px;
+      white-space: nowrap;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .filter-row select, .filter-row input { max-width: 190px; padding: 11px 12px; }
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 1fr; }
+      aside { position: static; height: auto; }
+      nav { grid-template-columns: repeat(3,1fr); }
+      .stats, .two-col, .three-col { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      main { padding: 18px; }
+      .topbar { flex-direction: column; align-items: start; }
+      .form-grid { grid-template-columns: 1fr; }
+      nav { grid-template-columns: 1fr; }
+      .actions { width: 100%; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">
+        <div class="brand-logo">FX</div>
+        <div>
+          <strong>FX Control</strong>
+          <small>Ledger & Branch System</small>
+        </div>
+      </div>
+
+      <nav>
+        <button class="nav-item active" data-page="dashboard"><span class="nav-dot"></span>Dashboard</button>
+        <button class="nav-item" data-page="transaction"><span class="nav-dot"></span>New FX Transaction</button>
+        <button class="nav-item" data-page="ledger"><span class="nav-dot"></span>FX Ledger</button>
+        <button class="nav-item" data-page="rates"><span class="nav-dot"></span>Rates Database</button>
+        <button class="nav-item" data-page="branches"><span class="nav-dot"></span>Branches</button>
+        <button class="nav-item" data-page="receipts"><span class="nav-dot"></span>Receipts</button>
+      </nav>
+
+      <div class="sidebar-card">
+        <strong>System Scope</strong>
+        <p>Buying, selling, equivalent rate computation, branch inventory, receipts, and ledger records in one clean workflow.</p>
+      </div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div class="title">
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSubtitle">Overview of FX buying, selling, branch balances, and today’s transactions.</p>
+        </div>
+        <div class="actions">
+          <span class="pill">June 8, 2026</span>
+          <button class="btn secondary" onclick="window.print()">Print</button>
+          <button class="btn" onclick="goTo('transaction')">New Transaction</button>
+        </div>
+      </div>
+
+      <section class="page active" id="dashboard">
+        <div class="grid stats">
+          <div class="stat-card"><div class="stat-label">Today’s Volume</div><div class="stat-value">₱4.86M</div><div class="stat-sub">+18.2% vs yesterday</div></div>
+          <div class="stat-card"><div class="stat-label">FX Transactions</div><div class="stat-value">128</div><div class="stat-sub">74 Buy / 54 Sell</div></div>
+          <div class="stat-card"><div class="stat-label">Branch Count</div><div class="stat-value">6</div><div class="stat-sub">All active</div></div>
+          <div class="stat-card"><div class="stat-label">Open Variance</div><div class="stat-value">₱0.00</div><div class="stat-sub">Balanced</div></div>
+        </div>
+
+        <div class="grid two-col" style="margin-top:18px;">
+          <div class="card">
+            <div class="card-header">
+              <div><h2>Transaction Volume by Branch</h2><p>Sample daily volume across active branches.</p></div>
+            </div>
+            <div class="mini-chart">
+              <div class="bar" style="height:78%"><span>BGC</span></div>
+              <div class="bar" style="height:58%"><span>Makati</span></div>
+              <div class="bar" style="height:42%"><span>Cebu</span></div>
+              <div class="bar" style="height:66%"><span>Ortigas</span></div>
+              <div class="bar" style="height:36%"><span>Davao</span></div>
+              <div class="bar" style="height:52%"><span>QC</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div><h2>Live FX Rates</h2><p>Approved branch-wide rates.</p></div></div>
+            <div class="grid">
+              <div class="rate-card"><div><div class="rate-pair">USD/PHP</div><div class="helper">US Dollar</div></div><div class="rate-values">Buy <strong>56.10</strong><br/>Sell <strong>56.45</strong></div></div>
+              <div class="rate-card"><div><div class="rate-pair">CNY/PHP</div><div class="helper">Chinese Yuan</div></div><div class="rate-values">Buy <strong>7.72</strong><br/>Sell <strong>7.89</strong></div></div>
+              <div class="rate-card"><div><div class="rate-pair">HKD/PHP</div><div class="helper">Hong Kong Dollar</div></div><div class="rate-values">Buy <strong>7.14</strong><br/>Sell <strong>7.28</strong></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px;">
+          <div class="card-header"><div><h2>Recent Ledger Entries</h2><p>Latest posted FX records.</p></div></div>
+          <table>
+            <thead><tr><th>Receipt</th><th>Branch</th><th>Type</th><th>Currency</th><th>FCY Amount</th><th>Rate</th><th>PHP Equivalent</th><th>Status</th></tr></thead>
+            <tbody id="dashboardLedger"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="transaction">
+        <div class="grid two-col">
+          <div class="card">
+            <div class="card-header"><div><h2>Create FX Transaction</h2><p>Buy or sell foreign currency and auto-compute the equivalent amount.</p></div></div>
+            <div class="form-grid">
+              <div><label>Branch</label><select id="branch"><option>BGC Branch</option><option>Makati Branch</option><option>Cebu Branch</option><option>Ortigas Branch</option><option>Davao Branch</option><option>QC Branch</option></select></div>
+              <div><label>Transaction Type</label><select id="type"><option value="BUY">Buying FX</option><option value="SELL">Selling FX</option></select></div>
+              <div><label>Customer Name</label><input id="customer" value="Juan Dela Cruz" /></div>
+              <div><label>Currency</label><select id="currency"><option value="USD">USD</option><option value="CNY">CNY</option><option value="HKD">HKD</option><option value="EUR">EUR</option><option value="JPY">JPY</option></select></div>
+              <div><label>Foreign Currency Amount</label><input id="amount" type="number" value="1000" /></div>
+              <div><label>Applied Rate</label><input id="rate" type="number" step="0.0001" value="56.45" /></div>
+              <div><label>Service Fee</label><input id="fee" type="number" value="0" /></div>
+              <div><label>Processed By</label><input id="cashier" value="Cashier 01" /></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+              <button class="btn" onclick="postTransaction()">Post to Ledger</button>
+              <button class="btn secondary" onclick="calculateOnly()">Recalculate</button>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h2 style="margin-top:0;">Transaction Summary</h2>
+            <p class="helper">Equivalent amount updates based on amount, rate, type, and fee.</p>
+            <div class="summary-row"><span>Transaction Type</span><strong id="sumType">Buying FX</strong></div>
+            <div class="summary-row"><span>Currency</span><strong id="sumCurrency">USD</strong></div>
+            <div class="summary-row"><span>FCY Amount</span><strong id="sumAmount">1,000.00</strong></div>
+            <div class="summary-row"><span>Applied Rate</span><strong id="sumRate">56.45</strong></div>
+            <div class="summary-row"><span>PHP Equivalent</span><strong id="sumPhp">₱56,450.00</strong></div>
+            <div class="summary-row"><span>Net Amount</span><strong id="sumNet">₱56,450.00</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="ledger">
+        <div class="card">
+          <div class="card-header"><div><h2>FX Ledger</h2><p>Permanent record of all buying and selling transactions.</p></div><button class="btn secondary">Export CSV</button></div>
+          <div class="filter-row">
+            <select id="filterBranch" onchange="renderLedger()"><option value="ALL">All Branches</option><option>BGC Branch</option><option>Makati Branch</option><option>Cebu Branch</option><option>Ortigas Branch</option><option>Davao Branch</option><option>QC Branch</option></select>
+            <select id="filterType" onchange="renderLedger()"><option value="ALL">All Types</option><option value="BUY">Buying FX</option><option value="SELL">Selling FX</option></select>
+            <input id="searchReceipt" placeholder="Search receipt no." oninput="renderLedger()" />
+          </div>
+          <table>
+            <thead><tr><th>Date</th><th>Receipt</th><th>Branch</th><th>Customer</th><th>Type</th><th>Currency</th><th>FCY Amount</th><th>Rate</th><th>PHP Equivalent</th><th>Status</th></tr></thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="rates">
+        <div class="card">
+          <div class="card-header"><div><h2>FX Rates Database</h2><p>Buying and selling rates with effective date and approval status.</p></div><button class="btn">Add Rate</button></div>
+          <table>
+            <thead><tr><th>Currency</th><th>Buying Rate</th><th>Selling Rate</th><th>Branch Scope</th><th>Effective Date</th><th>Approved By</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>USD</td><td>56.10</td><td>56.45</td><td>All Branches</td><td>Jun 8, 2026</td><td>FX Manager</td><td><span class="badge done">Active</span></td></tr>
+              <tr><td>CNY</td><td>7.72</td><td>7.89</td><td>All Branches</td><td>Jun 8, 2026</td><td>FX Manager</td><td><span class="badge done">Active</span></td></tr>
+              <tr><td>HKD</td><td>7.14</td><td>7.28</td><td>BGC Branch</td><td>Jun 8, 2026</td><td>Compliance</td><td><span class="badge done">Active</span></td></tr>
+              <tr><td>EUR</td><td>61.20</td><td>61.85</td><td>All Branches</td><td>Jun 8, 2026</td><td>FX Manager</td><td><span class="badge pending">Pending</span></td></tr>
+              <tr><td>JPY</td><td>0.3580</td><td>0.3710</td><td>All Branches</td><td>Jun 8, 2026</td><td>FX Manager</td><td><span class="badge done">Active</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="branches">
+        <div class="grid three-col">
+          <div class="card branch-card"><div class="branch-head"><div><h3>BGC Branch</h3><p class="helper">Main branch</p></div><span class="badge done">Active</span></div><div><div class="helper">Today’s Volume</div><strong>₱1.42M</strong></div><div><div class="helper">Cash Utilization</div><div class="meter"><span style="width:76%"></span></div></div></div>
+          <div class="card branch-card"><div class="branch-head"><div><h3>Makati Branch</h3><p class="helper">Metro Manila</p></div><span class="badge done">Active</span></div><div><div class="helper">Today’s Volume</div><strong>₱1.06M</strong></div><div><div class="helper">Cash Utilization</div><div class="meter"><span style="width:58%"></span></div></div></div>
+          <div class="card branch-card"><div class="branch-head"><div><h3>Cebu Branch</h3><p class="helper">Visayas</p></div><span class="badge done">Active</span></div><div><div class="helper">Today’s Volume</div><strong>₱760K</strong></div><div><div class="helper">Cash Utilization</div><div class="meter"><span style="width:46%"></span></div></div></div>
+          <div class="card branch-card"><div class="branch-head"><div><h3>Ortigas Branch</h3><p class="helper">Metro Manila</p></div><span class="badge done">Active</span></div><div><div class="helper">Today’s Volume</div><strong>₱980K</strong></div><div><div class="helper">Cash Utilization</div><div class="meter"><span style="width:64%"></span></div></div></div>
+          <div class="card branch-card"><div class="branch-head"><div><h3>Davao Branch</h3><p class="helper">Mindanao</p></div><span class="badge done">Active</span></div><div><div class="helper">Today’s Volume</div><strong>₱420K</strong></div><div><div class="helper">Cash Utilization</div><div class="meter"><span style="width:34%"></span></div></div></div>
+          <div class="card branch-card"><div class="branch-head"><div><h3>QC Branch</h3><p class="helper">Metro Manila</p></div><span class="badge done">Active</span></div><div><div class="helper">Today’s Volume</div><strong>₱610K</strong></div><div><div class="helper">Cash Utilization</div><div class="meter"><span style="width:51%"></span></div></div></div>
+        </div>
+      </section>
+
+      <section class="page" id="receipts">
+        <div class="grid two-col">
+          <div class="card">
+            <div class="card-header"><div><h2>Receipt List</h2><p>Issued receipts from completed FX transactions.</p></div></div>
+            <table>
+              <thead><tr><th>Receipt No.</th><th>Branch</th><th>Customer</th><th>Amount</th></tr></thead>
+              <tbody id="receiptList"></tbody>
+            </table>
+          </div>
+          <div class="receipt" id="receiptPreview"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const pages = {
+      dashboard: ['Dashboard', 'Overview of FX buying, selling, branch balances, and today’s transactions.'],
+      transaction: ['New FX Transaction', 'Create buying or selling transactions with automatic equivalent rate computation.'],
+      ledger: ['FX Ledger', 'Searchable ledger for all posted FX transactions across branches.'],
+      rates: ['Rates Database', 'Centralized FX rate database for buying, selling, branches, and approval history.'],
+      branches: ['Branches', 'Monitor branch-level volume, utilization, and currency activity.'],
+      receipts: ['Receipts', 'Receipt generation and print preview for posted transactions.']
+    };
+
+    const ledger = [
+      {date:'Jun 8, 2026 10:30', receipt:'FXR-000001', branch:'BGC Branch', customer:'Juan Dela Cruz', type:'SELL', currency:'USD', amount:1000, rate:56.45, php:56450, status:'Completed'},
+      {date:'Jun 8, 2026 10:18', receipt:'FXR-000002', branch:'Makati Branch', customer:'Maria Santos', type:'BUY', currency:'USD', amount:2500, rate:56.10, php:140250, status:'Completed'},
+      {date:'Jun 8, 2026 09:54', receipt:'FXR-000003', branch:'Cebu Branch', customer:'ABC Trading', type:'SELL', currency:'CNY', amount:8000, rate:7.89, php:63120, status:'Completed'},
+      {date:'Jun 8, 2026 09:22', receipt:'FXR-000004', branch:'Ortigas Branch', customer:'Lee Wei', type:'BUY', currency:'HKD', amount:12000, rate:7.14, php:85680, status:'Completed'},
+      {date:'Jun 8, 2026 08:45', receipt:'FXR-000005', branch:'QC Branch', customer:'Global Mart', type:'SELL', currency:'JPY', amount:200000, rate:0.371, php:74200, status:'Completed'}
+    ];
+
+    function peso(n) { return '₱' + Number(n).toLocaleString('en-PH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+    function money(n) { return Number(n).toLocaleString('en-PH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+    function goTo(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(page).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+      document.getElementById('pageTitle').textContent = pages[page][0];
+      document.getElementById('pageSubtitle').textContent = pages[page][1];
+      if (page === 'ledger') renderLedger();
+      if (page === 'receipts') renderReceipts();
+    }
+
+    document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => goTo(btn.dataset.page)));
+
+    function badge(type) {
+      if (type === 'BUY') return '<span class="badge buy">Buying FX</span>';
+      return '<span class="badge sell">Selling FX</span>';
+    }
+
+    function renderDashboardLedger() {
+      document.getElementById('dashboardLedger').innerHTML = ledger.slice(0,5).map(x => `
+        <tr><td>${x.receipt}</td><td>${x.branch}</td><td>${badge(x.type)}</td><td>${x.currency}</td><td>${money(x.amount)}</td><td>${x.rate}</td><td>${peso(x.php)}</td><td><span class="badge done">${x.status}</span></td></tr>
+      `).join('');
+    }
+
+    function renderLedger() {
+      const branch = document.getElementById('filterBranch')?.value || 'ALL';
+      const type = document.getElementById('filterType')?.value || 'ALL';
+      const search = (document.getElementById('searchReceipt')?.value || '').toLowerCase();
+      const rows = ledger.filter(x => (branch === 'ALL' || x.branch === branch) && (type === 'ALL' || x.type === type) && x.receipt.toLowerCase().includes(search));
+      document.getElementById('ledgerBody').innerHTML = rows.map(x => `
+        <tr><td>${x.date}</td><td>${x.receipt}</td><td>${x.branch}</td><td>${x.customer}</td><td>${badge(x.type)}</td><td>${x.currency}</td><td>${money(x.amount)}</td><td>${x.rate}</td><td>${peso(x.php)}</td><td><span class="badge done">${x.status}</span></td></tr>
+      `).join('');
+    }
+
+    function calculateOnly() {
+      const type = document.getElementById('type').value;
+      const currency = document.getElementById('currency').value;
+      const amount = Number(document.getElementById('amount').value || 0);
+      const rate = Number(document.getElementById('rate').value || 0);
+      const fee = Number(document.getElementById('fee').value || 0);
+      const php = amount * rate;
+      const net = type === 'BUY' ? php - fee : php + fee;
+      document.getElementById('sumType').textContent = type === 'BUY' ? 'Buying FX' : 'Selling FX';
+      document.getElementById('sumCurrency').textContent = currency;
+      document.getElementById('sumAmount').textContent = money(amount);
+      document.getElementById('sumRate').textContent = rate.toFixed(4).replace(/0+$/,'').replace(/\.$/,'');
+      document.getElementById('sumPhp').textContent = peso(php);
+      document.getElementById('sumNet').textContent = peso(net);
+      return {type,currency,amount,rate,fee,php,net};
+    }
+
+    ['type','currency','amount','rate','fee'].forEach(id => document.getElementById(id).addEventListener('input', calculateOnly));
+
+    function postTransaction() {
+      const c = calculateOnly();
+      const next = String(ledger.length + 1).padStart(6,'0');
+      ledger.unshift({
+        date: 'Jun 8, 2026 11:05',
+        receipt: 'FXR-' + next,
+        branch: document.getElementById('branch').value,
+        customer: document.getElementById('customer').value,
+        type: c.type,
+        currency: c.currency,
+        amount: c.amount,
+        rate: c.rate,
+        php: c.php,
+        status: 'Completed',
+        cashier: document.getElementById('cashier').value
+      });
+      renderDashboardLedger();
+      renderLedger();
+      renderReceipts();
+      goTo('receipts');
+    }
+
+    function renderReceipts() {
+      document.getElementById('receiptList').innerHTML = ledger.slice(0,8).map((x, i) => `
+        <tr style="cursor:pointer" onclick="showReceipt(${i})"><td>${x.receipt}</td><td>${x.branch}</td><td>${x.customer}</td><td>${peso(x.php)}</td></tr>
+      `).join('');
+      showReceipt(0);
+    }
+
+    function showReceipt(index) {
+      const x = ledger[index];
+      if (!x) return;
+      document.getElementById('receiptPreview').innerHTML = `
+        <div class="receipt-top">
+          <h3>FX TRANSACTION RECEIPT</h3>
+          <div>${x.branch}</div>
+          <small>${x.receipt}</small>
+        </div>
+        <div class="receipt-line"><span>Date/Time</span><strong>${x.date}</strong></div>
+        <div class="receipt-line"><span>Customer</span><strong>${x.customer}</strong></div>
+        <div class="receipt-line"><span>Transaction Type</span><strong>${x.type === 'BUY' ? 'BUYING FX' : 'SELLING FX'}</strong></div>
+        <div class="receipt-line"><span>Currency</span><strong>${x.currency}</strong></div>
+        <div class="receipt-line"><span>FCY Amount</span><strong>${money(x.amount)}</strong></div>
+        <div class="receipt-line"><span>Applied Rate</span><strong>${x.rate}</strong></div>
+        <div class="receipt-line receipt-total"><span>PHP Equivalent</span><strong>${peso(x.php)}</strong></div>
+        <div style="text-align:center;margin-top:18px;font-size:11px;color:#64748b;">Posted to FX Ledger • System Generated Receipt</div>
+      `;
+    }
+
+    renderDashboardLedger();
+    renderLedger();
+    renderReceipts();
+    calculateOnly();
+  </script>
+</body>
+</html>
