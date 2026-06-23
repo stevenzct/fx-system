@@ -6,6 +6,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 type ButtonChildProps = {
+  className?: string;
   variant?: "primary" | "secondary";
   asChild: true;
   children: ReactNode;
@@ -18,16 +19,16 @@ const variants = {
 
 export function Button(props: ButtonProps | ButtonChildProps) {
   const variant = props.variant ?? "primary";
-  const className = `inline-flex min-h-11 items-center justify-center rounded-[13px] border px-4 py-2.5 text-sm font-bold transition hover:-translate-y-0.5 ${variants[variant]}`;
+  const baseClassName = `inline-flex min-h-11 items-center justify-center rounded-[13px] border px-4 py-2.5 text-sm font-bold transition hover:-translate-y-0.5 ${variants[variant]}`;
 
   if (props.asChild) {
-    return <span className={className}>{props.children}</span>;
+    return <span className={`${baseClassName} ${props.className ?? ""}`}>{props.children}</span>;
   }
 
   const { children, className: extraClassName, ...buttonProps } = props;
 
   return (
-    <button className={`${className} ${extraClassName ?? ""}`} {...buttonProps}>
+    <button className={`${baseClassName} ${extraClassName ?? ""}`} {...buttonProps}>
       {children}
     </button>
   );

@@ -26,19 +26,24 @@ export function Topbar() {
         <h1 className="m-0 text-[28px] font-extrabold tracking-[-0.04em]">{meta.title}</h1>
         <p className="mt-1.5 text-muted">{meta.subtitle}</p>
       </div>
-      <div className="flex flex-wrap items-center gap-2.5">
-        <span className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-white px-3.5 py-2.5 text-sm font-semibold text-muted shadow-[0_6px_18px_rgba(15,23,42,0.04)]">
+      <div className="grid w-full grid-cols-2 items-center gap-2 sm:w-auto sm:flex sm:gap-2.5">
+        <span className="col-span-2 inline-flex min-h-10 min-w-0 items-center justify-center gap-1.5 rounded-[13px] border border-line bg-white px-2 py-2 text-xs font-semibold text-muted shadow-[0_6px_18px_rgba(15,23,42,0.04)] sm:col-span-1 sm:min-h-11 sm:justify-start sm:gap-2 sm:rounded-full sm:px-3.5 sm:py-2.5 sm:text-sm">
           <CalendarIcon />
-          {reportDate}
+          <span className="truncate">{reportDate}</span>
         </span>
-        <Button type="button" variant="secondary" onClick={() => window.print()}>
+        <Button
+          type="button"
+          variant="secondary"
+          className="min-h-10 min-w-0 gap-1.5 px-2 py-2 text-xs sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm"
+          onClick={() => window.print()}
+        >
           <PrintIcon />
-          Print
+          <span className="truncate">Print</span>
         </Button>
-        <Button asChild>
-          <Link href="/ledger/new" className="inline-flex items-center gap-2">
+        <Button asChild className="min-h-10 min-w-0 px-2 py-2 text-xs sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm">
+          <Link href="/ledger/new" className="inline-flex min-w-0 items-center gap-1.5 sm:gap-2">
             <PlusIcon />
-            New Transaction
+            <span className="truncate">New Transaction</span>
           </Link>
         </Button>
       </div>
@@ -59,7 +64,7 @@ function CalendarIcon() {
 
 function PrintIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="mr-2 size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M7 8V3h10v5" />
       <path d="M7 17H5a2 2 0 0 1-2-2v-3a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v3a2 2 0 0 1-2 2h-2" />
       <path d="M7 14h10v7H7z" />
