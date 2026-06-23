@@ -1,6 +1,12 @@
 import type { Branch, DashboardMetric, FxRate, LedgerEntry } from "@/types/fx";
 
-export const reportDate = "June 8, 2026";
+export function getReportDate(date = new Date()) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
 
 export const branches: Branch[] = [
   { id: "bgc", name: "BGC Branch", location: "Main branch", status: "Active", todayVolume: 1420000, utilization: 76 },

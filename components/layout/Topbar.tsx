@@ -1,14 +1,24 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { reportDate } from "@/data/mockData";
+import { getReportDate } from "@/data/mockData";
 import { pageMeta } from "@/components/layout/navigation";
 import { Button } from "@/components/ui/Button";
 
 export function Topbar() {
   const pathname = usePathname();
   const meta = pathname.startsWith("/transactions/") ? pageMeta["/transactions/detail"] : pageMeta[pathname] ?? pageMeta["/dashboard"];
+  const [reportDate, setReportDate] = useState(() => getReportDate());
+
+  useEffect(() => {
+    const updateReportDate = () => setReportDate(getReportDate());
+    updateReportDate();
+
+    const interval = window.setInterval(updateReportDate, 60 * 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   return (
     <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
